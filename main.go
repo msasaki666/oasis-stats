@@ -5,15 +5,24 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
+	"regexp"
+	"strconv"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/msasaki666/oasis-stats/models"
 	"github.com/otiai10/gosseract"
 	"github.com/pkg/errors"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-func scrapeOasisUsageStats() {
+func scrapeOasisUsageStats(db *gorm.DB) {
 	client := gosseract.NewClient()
 	defer client.Close()
+
+	statPattern := regexp.MustCompile(`\d+`)
 
 	// Request the HTML page.
 	res, err := http.Get("https://www.sportsoasis.co.jp/sh07/usage_stats/")
@@ -30,7 +39,7 @@ func scrapeOasisUsageStats() {
 	if err != nil {
 		log.Fatal(errors.WithStack(err).Error())
 	}
-
+	var stats []int
 	// Find the review items
 	doc.Find("#point2 ul").Each(func(i int, s *goquery.Selection) {
 		// For each item found, get the title
@@ -57,10 +66,34 @@ func scrapeOasisUsageStats() {
 		if err != nil {
 			log.Fatal(errors.WithStack(err).Error())
 		}
-		fmt.Printf("%s\n", t)
+		stat := statPattern.FindString(t)
+		statInt, err := strconv.Atoi(stat)
+		if err != nil {
+			log.Fatal(errors.WithStack(err).Error())
+		}
+		stats = append(stats, statInt)
 	})
+	m := models.UsageStat{Female: stats[0], Male: stats[1], ScrapedAt: time.Now()}
+	db.Create(&m)
+	fmt.Println(m.Female)
+	fmt.Println(m.Male)
+	fmt.Println(m.ScrapedAt)
 }
 
 func main() {
-	scrapeOasisUsageStats()
+	dsn, ok := os.LookupEnv("DB_DSN")
+	if !ok {
+		log.Fatal("set DB_DSN")
+	}
+	db, err := gorm.Open(
+		postgres.Open(dsn),
+		&gorm.Config{},
+	)
+	if err != nil {
+		log.Fatal(errors.WithStack(err).Error())
+	}
+	if err = db.AutoMigrate(models.MigrationTargets()...); err != nil {
+		log.Fatal(errors.WithStack(err).Error())
+	}
+	scrapeOasisUsageStats(db)
 }
