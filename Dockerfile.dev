@@ -17,6 +17,6 @@ RUN go install github.com/x-motemen/gore/cmd/gore@latest && \
     # 単体テストをいい感じに生成してくれるツール
     go install github.com/cweill/gotests/gotests@latest && \
     apt-get update && \
-    apt-get install -y --no-install-recommends peco && \
+    apt-get install -y --no-install-recommends peco tesseract-ocr libtesseract-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
