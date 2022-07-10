@@ -1,0 +1,30 @@
+volumes:
+  db-data:
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/go/src/app:cached
+    command:
+      tail -f /dev/null
+    ports:
+      - 8080:8080
+    env_file:
+      - .env
+    depends_on:
+      - db
+  db:
+    image: postgres:14
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      # - ./db:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=app
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST_AUTH_METHOD=trust

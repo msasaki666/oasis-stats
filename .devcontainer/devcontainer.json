@@ -1,0 +1,25 @@
+{
+  "name": "app",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+  ],
+  "service": "app",
+  "workspaceFolder": "/go/src/app",
+  "settings": {
+    "editor.formatOnSave": true,
+    "dotfiles.repository": "msasaki666/dotfiles",
+    "dotfiles.targetPath": "~/dotfiles",
+    "dotfiles.installCommand": "~/dotfiles/install.sh",
+  },
+  "extensions": [
+    "mosapride.zenkaku",
+    "mhutchie.git-graph",
+    "donjayamanne.githistory",
+    "eamodio.gitlens",
+    "golang.go",
+    "editorconfig.editorconfig",
+    "ms-vscode.hexeditor",
+    "ms-vscode.makefile-tools"
+  ],
+  "postCreateCommand": "apt-get update && apt-get install -y peco",
+}
