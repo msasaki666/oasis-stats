@@ -20,6 +20,5 @@
     "editorconfig.editorconfig",
     "ms-vscode.hexeditor",
     "ms-vscode.makefile-tools"
-  ],
-  "postCreateCommand": "apt-get update && apt-get install -y peco",
+  ]
 }

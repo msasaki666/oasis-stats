@@ -1,0 +1,52 @@
+package main
+
+import (
+	"log"
+	"net/http"
+	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/msasaki666/oasis-stats/models"
+	"github.com/pkg/errors"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+)
+
+func Main() {
+	dsn, ok := os.LookupEnv("DB_DSN")
+	if !ok {
+		log.Fatal("set DB_DSN")
+	}
+	db, err := gorm.Open(
+		postgres.Open(dsn),
+		&gorm.Config{},
+	)
+	if err != nil {
+		log.Fatal(errors.WithStack(err).Error())
+	}
+	if err = db.AutoMigrate(models.MigrationTargets()...); err != nil {
+		log.Fatal(errors.WithStack(err).Error())
+	}
+	r := setupRouter(db)
+	r.Run()
+}
+
+func setupRouter(db *gorm.DB) *gin.Engine {
+	r := gin.Default()
+
+	r.GET("/health", func(c *gin.Context) {
+		c.IndentedJSON(200, gin.H{
+			"status": "ok",
+		})
+	})
+
+	r.GET("/usage_stats", func(c *gin.Context) {
+		var stats []models.UsageStat
+		if tx := db.Find(&stats); tx.Error != nil {
+			c.JSON(http.StatusInternalServerError, tx.Error)
+			return
+		}
+		c.JSON(http.StatusOK, &stats)
+	})
+	return r
+}

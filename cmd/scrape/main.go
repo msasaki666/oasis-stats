@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -75,9 +74,6 @@ func scrapeOasisUsageStats(db *gorm.DB) {
 	})
 	m := models.UsageStat{Female: stats[0], Male: stats[1], ScrapedAt: time.Now()}
 	db.Create(&m)
-	fmt.Println(m.Female)
-	fmt.Println(m.Male)
-	fmt.Println(m.ScrapedAt)
 }
 
 func main() {

@@ -7,8 +7,12 @@ import (
 )
 
 type UsageStat struct {
-	gorm.Model
-	Female    int       `gorm:"not null"`
-	Male      int       `gorm:"not null"`
-	ScrapedAt time.Time `gorm:"not null"`
+	// json tag設定したかったので
+	ID        uint           `gorm:"primarykey" json:"-"`
+	CreatedAt time.Time      `json:"-"`
+	UpdatedAt time.Time      `json:"-"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	Female    int            `gorm:"not null"`
+	Male      int            `gorm:"not null"`
+	ScrapedAt time.Time      `gorm:"not null"`
 }
