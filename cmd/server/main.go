@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"log"
@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Main() {
+func Run() {
 	dsn, ok := os.LookupEnv("DB_DSN")
 	if !ok {
 		log.Fatal("set DB_DSN")
