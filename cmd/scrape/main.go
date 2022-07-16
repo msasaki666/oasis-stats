@@ -127,7 +127,7 @@ func waitUntilRequiredTime(db *gorm.DB) {
 }
 
 func inBusiness(dayOfWeek int) bool {
-	b, exist := os.LookupEnv("BUSINESS_TIME_PATTERN_" + strings.ToUpper(strconv.Itoa(dayOfWeek)))
+	b, exist := os.LookupEnv("BUSINESS_TIME_PATTERN_" + strconv.Itoa(dayOfWeek))
 	if !exist {
 		return true
 	}
