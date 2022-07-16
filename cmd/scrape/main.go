@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -132,8 +133,10 @@ func inBusiness(dayOfWeek int) bool {
 	}
 
 	businessTimes := strings.Split(b, ",")
-	start, end := businessTimes[0], businessTimes[1]
 	now := time.Now()
+	y, m, d := now.Date()
+	start, end := fmt.Sprintf("%d-%s-%dT%s", y, m, d, businessTimes[0]), fmt.Sprintf("%d-%s-%dT%s", y, m, d, businessTimes[1])
+
 	if now.After(parseTime(start)) && now.Before(parseTime(end)) {
 		return true
 	}
@@ -142,8 +145,7 @@ func inBusiness(dayOfWeek int) bool {
 }
 
 func parseTime(t string) time.Time {
-	l := time.Now().String()
-	tt, err := time.Parse(l, t)
+	tt, err := time.Parse(time.RFC3339, t)
 	if err != nil {
 		log.Fatal(errors.WithStack(err).Error())
 	}
