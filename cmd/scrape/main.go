@@ -108,8 +108,13 @@ func waitUntilRequiredTime(db *gorm.DB) {
 	if nextScrapingAt.Equal(now) || nextScrapingAt.After(now) {
 		return
 	} else {
-		log.Printf("wait until %s\n", nextScrapingAt)
 		d := nextScrapingAt.Sub(now)
+		if d > 10*time.Minute {
+			log.Printf("wait limit is 10 minutes")
+			os.Exit(0)
+		}
+
+		log.Printf("wait until %s\n", nextScrapingAt)
 		time.Sleep(d)
 		return
 	}
