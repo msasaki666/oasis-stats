@@ -17,7 +17,27 @@ import (
 	"gorm.io/gorm"
 )
 
+func main() {
+	dsn, ok := os.LookupEnv("DATABASE_URL")
+	if !ok {
+		log.Fatal("set DATABASE_URL")
+	}
+	db, err := gorm.Open(
+		postgres.Open(dsn),
+		&gorm.Config{},
+	)
+	if err != nil {
+		log.Fatal(errors.WithStack(err).Error())
+	}
+	if err = db.AutoMigrate(models.MigrationTargets()...); err != nil {
+		log.Fatal(errors.WithStack(err).Error())
+	}
+	scrapeOasisUsageStats(db)
+}
+
 func scrapeOasisUsageStats(db *gorm.DB) {
+	waitUntilRequiredTime(db)
+
 	client := gosseract.NewClient()
 	defer client.Close()
 
@@ -76,20 +96,21 @@ func scrapeOasisUsageStats(db *gorm.DB) {
 	db.Create(&m)
 }
 
-func main() {
-	dsn, ok := os.LookupEnv("DATABASE_URL")
-	if !ok {
-		log.Fatal("set DATABASE_URL")
+func waitUntilRequiredTime(db *gorm.DB) {
+	var lastStat models.UsageStat
+
+	if tx := db.Order("scraped_at").Last(&lastStat); tx.Error != nil {
+		log.Fatal(tx.Error)
 	}
-	db, err := gorm.Open(
-		postgres.Open(dsn),
-		&gorm.Config{},
-	)
-	if err != nil {
-		log.Fatal(errors.WithStack(err).Error())
+
+	nextScrapingAt := lastStat.ScrapedAt.Add(15 * time.Minute)
+	now := time.Now()
+	if nextScrapingAt.Equal(now) || nextScrapingAt.After(now) {
+		return
+	} else {
+		log.Printf("wait until %s\n", nextScrapingAt)
+		d := nextScrapingAt.Sub(now)
+		time.Sleep(d)
+		return
 	}
-	if err = db.AutoMigrate(models.MigrationTargets()...); err != nil {
-		log.Fatal(errors.WithStack(err).Error())
-	}
-	scrapeOasisUsageStats(db)
 }
