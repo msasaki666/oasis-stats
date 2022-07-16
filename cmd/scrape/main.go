@@ -99,7 +99,7 @@ func scrapeOasisUsageStats(db *gorm.DB) {
 func waitUntilRequiredTime(db *gorm.DB) {
 	var lastStat models.UsageStat
 
-	if tx := db.Order("scraped_at").Last(&lastStat); tx.Error != nil {
+	if tx := db.Order("scraped_at desc").First(&lastStat); tx.Error != nil {
 		log.Fatal(tx.Error)
 	}
 
