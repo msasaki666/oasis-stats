@@ -1,4 +1,4 @@
-package scrape
+package main
 
 import (
 	"io"
@@ -76,7 +76,7 @@ func scrapeOasisUsageStats(db *gorm.DB) {
 	db.Create(&m)
 }
 
-func Run() {
+func main() {
 	dsn, ok := os.LookupEnv("DB_DSN")
 	if !ok {
 		log.Fatal("set DB_DSN")
