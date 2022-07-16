@@ -134,8 +134,8 @@ func inBusiness(dayOfWeek int) bool {
 
 	businessTimes := strings.Split(b, ",")
 	now := time.Now()
-	y, m, d := now.Date()
-	start, end := fmt.Sprintf("%d-%d-%dT%s", y, m, d, businessTimes[0]), fmt.Sprintf("%d-%d-%dT%s", y, m, d, businessTimes[1])
+	yearMonthDate := strings.Split(now.String(), " ")[0]
+	start, end := fmt.Sprintf("%sT%s", yearMonthDate, businessTimes[0]), fmt.Sprintf("%sT%s", yearMonthDate, businessTimes[1])
 
 	if now.After(parseTime(start)) && now.Before(parseTime(end)) {
 		return true
