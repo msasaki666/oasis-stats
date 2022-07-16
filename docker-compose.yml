@@ -13,7 +13,7 @@ services:
     ports:
       - 8080:8080
     environment:
-      - DB_DSN=postgres://app:password@db:5432/app
+      - DATABASE_URL=postgres://app:password@db:5432/app
       - PORT=8080
     depends_on:
       - db

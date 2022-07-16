@@ -13,9 +13,9 @@ import (
 )
 
 func main() {
-	dsn, ok := os.LookupEnv("DB_DSN")
+	dsn, ok := os.LookupEnv("DATABASE_URL")
 	if !ok {
-		log.Fatal("set DB_DSN")
+		log.Fatal("set DATABASE_URL")
 	}
 	db, err := gorm.Open(
 		postgres.Open(dsn),
