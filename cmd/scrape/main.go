@@ -7,6 +7,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -36,6 +37,10 @@ func main() {
 }
 
 func scrapeOasisUsageStats(db *gorm.DB) {
+	if !inBusiness(int(time.Now().Weekday())) {
+		log.Println("not in business time")
+		os.Exit(0)
+	}
 	waitUntilRequiredTime(db)
 
 	client := gosseract.NewClient()
@@ -118,4 +123,29 @@ func waitUntilRequiredTime(db *gorm.DB) {
 		time.Sleep(d)
 		return
 	}
+}
+
+func inBusiness(dayOfWeek int) bool {
+	b, exist := os.LookupEnv("BUSINESS_TIME_PATTERN_" + strings.ToUpper(strconv.Itoa(dayOfWeek)))
+	if !exist {
+		return true
+	}
+
+	businessTimes := strings.Split(b, ",")
+	start, end := businessTimes[0], businessTimes[1]
+	now := time.Now()
+	if now.After(parseTime(start)) && now.Before(parseTime(end)) {
+		return true
+	}
+
+	return false
+}
+
+func parseTime(t string) time.Time {
+	l := time.Now().String()
+	tt, err := time.Parse(l, t)
+	if err != nil {
+		log.Fatal(errors.WithStack(err).Error())
+	}
+	return tt
 }
