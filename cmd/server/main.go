@@ -28,7 +28,7 @@ func main() {
 		log.Fatal(errors.WithStack(err).Error())
 	}
 	var stats []models.UsageStat
-	if tx := db.Where("weekday = ?", nil).Find(&stats); tx.Error != nil {
+	if tx := db.Find(&stats); tx.Error != nil {
 		log.Fatal(tx.Error)
 	}
 	for _, stat := range stats {
