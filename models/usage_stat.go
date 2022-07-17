@@ -15,5 +15,5 @@ type UsageStat struct {
 	Female    int            `gorm:"not null"`
 	Male      int            `gorm:"not null"`
 	ScrapedAt time.Time      `gorm:"not null"`
-	Weekday   int
+	Weekday   int            `gorm:"not null"`
 }

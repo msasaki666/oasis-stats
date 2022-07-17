@@ -27,13 +27,6 @@ func main() {
 	if err = db.AutoMigrate(models.MigrationTargets()...); err != nil {
 		log.Fatal(errors.WithStack(err).Error())
 	}
-	var stats []models.UsageStat
-	if tx := db.Find(&stats); tx.Error != nil {
-		log.Fatal(tx.Error)
-	}
-	for _, stat := range stats {
-		db.Model(&stat).Update("weekday", int(stat.ScrapedAt.Weekday()))
-	}
 	r := setupRouter(db)
 	r.Run()
 }
