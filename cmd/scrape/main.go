@@ -98,7 +98,8 @@ func scrapeOasisUsageStats(db *gorm.DB) {
 		}
 		stats = append(stats, statInt)
 	})
-	m := models.UsageStat{Female: stats[0], Male: stats[1], ScrapedAt: time.Now()}
+	now := time.Now()
+	m := models.UsageStat{Female: stats[0], Male: stats[1], ScrapedAt: now, Weekday: int(now.Weekday())}
 	db.Create(&m)
 }
 
